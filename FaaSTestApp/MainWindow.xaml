@@ -28,7 +28,7 @@
             <CheckBox IsChecked="{Binding ColdStartTesting}">Testowanie wpływu zimnego startu na szybkość odpowiedzi</CheckBox>
             <CheckBox IsEnabled="{Binding ColdStartTesting, Converter={StaticResource InvertBooleanConverter}}" IsChecked="{Binding ShouldRequestsBeSynchronous}">Synchroniczne wykonanie zapytań</CheckBox>
             <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Vertical" Width="{Binding ControlSectionWidth}">
                     <TextBlock FontWeight="Bold" FontSize="20" Text="Azure"/>
                     <TextBlock Text="Adres punktu obsługi żądań"/>
                     <TextBox Text="{Binding AzureEndpoint}"/>
@@ -36,10 +36,10 @@
                     <ComboBox SelectedValuePath="Method" SelectedItem="{Binding AzureRequestMethod}" ItemsSource="{Binding HttpMehtodTypesCollection}"/>
                     <ProgressBar Minimum="{Binding PBMinValue}" Value="{Binding AzurePBValue}" Maximum="{Binding EndpointRequestsNumberToMake}"/>
                 </StackPanel>
-                <TextBox IsEnabled="False" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Text="{Binding AzureLogs}" IsReadOnly="True" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Vertical" Width="{Binding ControlSectionWidth}">
                     <TextBlock FontWeight="Bold" FontSize="20" Text="AWS"/>
                     <TextBlock Text="Adres punktu obsługi żądań"/>
                     <TextBox Text="{Binding AWSEndpoint}"/>
@@ -47,10 +47,10 @@
                     <ComboBox SelectedValuePath="Method" SelectedItem="{Binding AWSRequestMethod}" ItemsSource="{Binding HttpMehtodTypesCollection}"/>
                     <ProgressBar Minimum="{Binding PBMinValue}" Value="{Binding AWSPBValue}" Maximum="{Binding EndpointRequestsNumberToMake}"/>
                 </StackPanel>
-                <TextBox IsEnabled="False" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Text="{Binding AWSLogs}" IsReadOnly="True" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Vertical" Width="{Binding ControlSectionWidth}">
                     <TextBlock FontWeight="Bold" FontSize="20" Text="Google Cloud"/>
                     <TextBlock Text="Adres punktu obsługi żądań"/>
                     <TextBox Text="{Binding GCEndpoint}"/>
@@ -58,9 +58,9 @@
                     <ComboBox SelectedValuePath="Method" SelectedItem="{Binding GCRequestMethod}" ItemsSource="{Binding HttpMehtodTypesCollection}"/>
                     <ProgressBar Minimum="{Binding PBMinValue}" Value="{Binding GCPBValue}" Maximum="{Binding EndpointRequestsNumberToMake}"/>
                 </StackPanel>
-                <TextBox IsEnabled="False" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Text="{Binding GCLogs}" IsReadOnly="True" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
             </StackPanel>
-            <Button Command="{Binding StartCommand}" Content="Start" IsEnabled="{Binding ElementName=RequestsTextBox, Path=(Validation.HasError), Converter={StaticResource InvertBooleanConverter}}"/>
+            <Button Command="{Binding StartCommand}" Content="Start" IsEnabled="{Binding IsStartEnabled}"/>
         </StackPanel>
     </Grid>
 </Window>

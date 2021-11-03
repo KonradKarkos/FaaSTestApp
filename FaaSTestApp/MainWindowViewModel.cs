@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using LicenseContext = OfficeOpenXml.LicenseContext;
@@ -43,8 +42,9 @@ namespace FaaSTestApp
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         #region Shared properties
-        public double InfoBlockHeight { get => 200; }
-        public double InfoBlockWidth { get => 400; }
+        public double InfoBlockHeight { get => 150; }
+        public double InfoBlockWidth { get => 700; }
+        public double ControlSectionWidth { get => 400; }
         private bool _coldStartTesting;
         public bool ColdStartTesting
         {
@@ -82,6 +82,7 @@ namespace FaaSTestApp
         public MainWindowViewModel()
         {
             EndpointRequestsNumberToMake = 1;
+            IsStartEnabled = true;
 
             _worker = new BackgroundWorker();
             _worker.DoWork += _worker_DoWork;
@@ -189,6 +190,8 @@ namespace FaaSTestApp
             }
 
             UpdateAndExportResults(azureResultId, awsResultId, gcResultId);
+
+            e.Result = new object[] { azureResultId, awsResultId, gcResultId };
         }
 
         private async Task PerformAsyncRequest(HttpClient httpClient, HttpRequestMessage httpRequestMessage, long testResultId, BackgroundWorker worker, int cloudNumber)
@@ -221,6 +224,7 @@ namespace FaaSTestApp
                 var azureResult = context.Results
                                             .Include(r => r.Requests)
                                             .Include(r => r.TestSession)
+                                            .AsNoTracking()
                                             .FirstOrDefault(r => r.Id == azureResultId);
                 CalculateSuccessAndAverageTime(azureResult);
                 ExportResultToExcel(AZURE_REPORT_FILENAME, azureResult);
@@ -228,6 +232,7 @@ namespace FaaSTestApp
                 var awsResult = context.Results
                                         .Include(r => r.Requests)
                                         .Include(r => r.TestSession)
+                                        .AsNoTracking()
                                         .FirstOrDefault(r => r.Id == awsResultId);
                 CalculateSuccessAndAverageTime(awsResult);
                 ExportResultToExcel(AWS_REPORT_FILENAME, awsResult);
@@ -235,6 +240,7 @@ namespace FaaSTestApp
                 var gcResult = context.Results
                                         .Include(r => r.Requests)
                                         .Include(r => r.TestSession)
+                                        .AsNoTracking()
                                         .FirstOrDefault(r => r.Id == gcResultId);
                 CalculateSuccessAndAverageTime(gcResult);
                 ExportResultToExcel(GC_REPORT_FILENAME, gcResult);
@@ -247,6 +253,9 @@ namespace FaaSTestApp
                 gcResult.TestSession = null;
                 gcResult.Requests = null;
 
+                context.Results.Update(azureResult);
+                context.Results.Update(awsResult);
+                context.Results.Update(gcResult);
                 context.SaveChanges();
             }
         }
@@ -330,6 +339,17 @@ namespace FaaSTestApp
 
         private void _worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            long azureResultId = (long)((object[])e.Result)[0];
+            long awsResultId = (long)((object[])e.Result)[1];
+            long gcResultId = (long)((object[])e.Result)[2];
+
+            using (var context = new AppDbContext())
+            {
+                AzureLogs += '\n' + context.Results.FirstOrDefault(r => r.Id == azureResultId).ToString();
+                AWSLogs += '\n' + context.Results.FirstOrDefault(r => r.Id == awsResultId).ToString();
+                GCLogs += '\n' + context.Results.FirstOrDefault(r => r.Id == gcResultId).ToString();
+            }
+
             AzurePBValue = 0;
             AWSPBValue = 0;
             GCPBValue = 0;
@@ -350,17 +370,26 @@ namespace FaaSTestApp
             get => _azureRequestMethod;
             set => SetProperty(ref _azureRequestMethod, value);
         }
+
         private string _azureEndpoint;
         public string AzureEndpoint
         {
             get => _azureEndpoint;
             set => SetProperty(ref _azureEndpoint, value);
         }
+
         private int _azurePBValue;
         public int AzurePBValue
         {
             get => _azurePBValue;
             set => SetProperty(ref _azurePBValue, value);
+        }
+
+        private string _azureLogs;
+        public string AzureLogs
+        {
+            get => _azureLogs;
+            set => SetProperty(ref _azureLogs, value);
         }
         #endregion Azure properties
 
@@ -371,17 +400,26 @@ namespace FaaSTestApp
             get => _awsRequestMethod;
             set => SetProperty(ref _awsRequestMethod, value);
         }
+
         private string _awsEndpoint;
         public string AWSEndpoint
         {
             get => _awsEndpoint;
             set => SetProperty(ref _awsEndpoint, value);
         }
+
         private int _awsPBValue;
         public int AWSPBValue
         {
             get => _awsPBValue;
             set => SetProperty(ref _awsPBValue, value);
+        }
+
+        private string _awsLogs;
+        public string AWSLogs
+        {
+            get => _awsLogs;
+            set => SetProperty(ref _awsLogs, value);
         }
         #endregion AWS properties
 
@@ -392,17 +430,26 @@ namespace FaaSTestApp
             get => _gcRequestMethod;
             set => SetProperty(ref _gcRequestMethod, value);
         }
+
         private string _gcEndpoint;
         public string GCEndpoint
         {
             get => _gcEndpoint;
             set => SetProperty(ref _gcEndpoint, value);
         }
+
         private int _gcPBValue;
         public int GCPBValue
         {
             get => _gcPBValue;
             set => SetProperty(ref _gcPBValue, value);
+        }
+
+        private string _gcLogs;
+        public string GCLogs
+        {
+            get => _gcLogs;
+            set => SetProperty(ref _gcLogs, value);
         }
         #endregion GC properties
 

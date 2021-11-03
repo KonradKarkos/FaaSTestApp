@@ -13,5 +13,13 @@ namespace FaaSTestApp.Data.Entities
         [ForeignKey(nameof(TestSession))]
         public long TestSessionId { get; set; }
         public virtual ICollection<TestRequest> Requests { get; set; }
+
+        public override string ToString()
+        {
+            return "Adres punktu obsługi żądań: " + Endpoint + '\n' +
+                "Średni czas odpowiedzi na zapytanie: " + AverageResponseTimeInMs + '\n' +
+                "Metoda HTTP: " + HttpMethod + '\n' +
+                "Czy wszystkie odpowiedzi były pozytywne: " + (WasSuccessful ? "Tak" : "Nie") + '\n';
+        }
     }
 }
