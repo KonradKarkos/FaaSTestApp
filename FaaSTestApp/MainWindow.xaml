@@ -60,7 +60,7 @@
                 </StackPanel>
                 <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Text="{Binding GCLogs}" IsReadOnly="True" Height="{Binding InfoBlockHeight}" Width="{Binding InfoBlockWidth}" Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
             </StackPanel>
-            <Button Command="{Binding StartCommand}" Content="Start" IsEnabled="{Binding IsStartEnabled}"/>
+            <Button Margin="5" Command="{Binding StartCommand}" Content="Start" IsEnabled="{Binding IsStartEnabled}"/>
         </StackPanel>
     </Grid>
 </Window>

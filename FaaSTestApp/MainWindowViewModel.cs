@@ -164,25 +164,33 @@ namespace FaaSTestApp
 
             if (_shouldRequestsBeSynchronous)
             {
-                int _20Minutes = 20 * 60 * 1000;
-                for (int i = 0; i < EndpointRequestsNumberToMake; i++)
+                int _30Minutes = 30 * 60 * 1000;
+                for (int i = 0; i < _endpointRequestsNumberToMake; i++)
                 {
                     requests.Add(PerformAsyncRequest(httpClient, new HttpRequestMessage(_azureRequestMethod, _azureEndpoint), azureResultId, worker, AZURE_CLOUD_NUMBER));
                     requests.Add(PerformAsyncRequest(httpClient, new HttpRequestMessage(_awsRequestMethod, _awsEndpoint), awsResultId, worker, AWS_CLOUD_NUMBER));
                     requests.Add(PerformAsyncRequest(httpClient, new HttpRequestMessage(_gcRequestMethod, _gcEndpoint), gcResultId, worker, GC_CLOUD_NUMBER));
                     Task.WaitAll(requests.ToArray());
-                    if (_coldStartTesting)
+                    if (_coldStartTesting && i+1 < _endpointRequestsNumberToMake)
                     {
-                        Thread.Sleep(_20Minutes);
+                        Thread.Sleep(_30Minutes);
                     }
                 }
             }
             else
             {
-                for (int i = 0; i < EndpointRequestsNumberToMake; i++)
+                for (int i = 0; i < _endpointRequestsNumberToMake; i++)
                 {
                     requests.Add(PerformAsyncRequest(httpClient, new HttpRequestMessage(_azureRequestMethod, _azureEndpoint), azureResultId, worker, AZURE_CLOUD_NUMBER));
+                }
+
+                for (int i = 0; i < _endpointRequestsNumberToMake; i++)
+                {
                     requests.Add(PerformAsyncRequest(httpClient, new HttpRequestMessage(_awsRequestMethod, _awsEndpoint), awsResultId, worker, AWS_CLOUD_NUMBER));
+                }
+
+                for (int i = 0; i < _endpointRequestsNumberToMake; i++)
+                {
                     requests.Add(PerformAsyncRequest(httpClient, new HttpRequestMessage(_gcRequestMethod, _gcEndpoint), gcResultId, worker, GC_CLOUD_NUMBER));
                 }
 
@@ -300,7 +308,7 @@ namespace FaaSTestApp
                 foreach(var request in result.Requests)
                 {
                     cellData.Add(new object[] { 
-                        request.SentAt,
+                        request.SentAt.ToString(),
                         result.Endpoint,
                         result.HttpMethod,
                         request.HttpResponseCode,
